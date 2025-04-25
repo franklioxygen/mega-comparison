@@ -4,7 +4,7 @@ import ImageGallery from './components/ImageGallery'
 import PixelComparison from './components/PixelComparison'
 
 const App = () => {
-  const [selectedPixels, setSelectedPixels] = useState<number[]>([])
+  const [selectedPixels, setSelectedPixels] = useState<number[]>([10, 40])
   const [activeTab, setActiveTab] = useState<'size' | 'gallery' | 'focal'>('size')
   
   const megapixelOptions = [10, 20, 30, 40, 60, 100]
