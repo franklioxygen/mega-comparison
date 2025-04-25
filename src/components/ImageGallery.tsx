@@ -57,7 +57,6 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ selectedPixels }) => {
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {selectedPixels.map(pixels => {
-          const dimensions = pixelDimensions[pixels];
           const displayDimensions = calculateDisplayDimensions(pixels);
           
           return (
@@ -65,9 +64,6 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ selectedPixels }) => {
               <div className="bg-gray-100 rounded-lg p-2 mb-3 relative">
                 <div className="absolute top-4 left-4 bg-white bg-opacity-90 rounded px-2 py-1 z-10">
                   <h3 className="font-medium text-gray-800">{pixels} MP</h3>
-                  <p className="text-xs text-gray-500">
-                    {dimensions.width} × {dimensions.height}
-                  </p>
                 </div>
                 <img 
                   src={getImagePath(pixels)} 
