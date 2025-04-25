@@ -67,7 +67,6 @@ const FocalLength: React.FC<FocalLengthProps> = () => {
     const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
     
     const containerRect = containerRef.current.getBoundingClientRect();
-    const viewRectElement = viewRectRef.current;
     
     // Calculate new position
     let newX = clientX - dragStart.x;
