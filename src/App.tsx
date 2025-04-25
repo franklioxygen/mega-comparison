@@ -23,11 +23,8 @@ const App = () => {
         <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
           MegaComparison
         </h1>
-        <p className="text-gray-600 max-w-2xl mx-auto mb-2">
-          Explore how camera sensor resolutions compare in real-world dimensions. From entry-level 10MP to professional 100MP sensors, visualize the actual size differences and understand what these numbers mean for your photography.
-        </p>
-        <p className="text-sm text-gray-500 max-w-2xl mx-auto">
-          Compare sensor resolutions side by side, view sample images, and explore how focal lengths affect your field of view.
+        <p className="text-gray-600 max-w-2xl mx-auto">
+          Compare camera sensors from 10MP to 100MP, with visual examples of resolution differences.
         </p>
       </header>
 
