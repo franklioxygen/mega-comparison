@@ -3,20 +3,41 @@ import FocalLength from './components/FocalLength'
 import ImageGallery from './components/ImageGallery'
 import LanguageToggle from './components/LanguageToggle'
 import PixelComparison from './components/PixelComparison'
+import SensorComparison from './components/SensorComparison'
 import { useLanguage } from './i18n/languageContext'
 
 const App = () => {
   const { t, language } = useLanguage();
   const [selectedPixels, setSelectedPixels] = useState<number[]>([10, 40]) // Default to 10MP and 40MP
-  const [activeTab, setActiveTab] = useState<'size' | 'gallery' | 'focal'>('size')
+  const [selectedSensors, setSelectedSensors] = useState<string[]>(['full-frame', 'aps-c']) // Default to FF and APS-C
+  const [activeTab, setActiveTab] = useState<'size' | 'gallery' | 'focal' | 'sensor'>('size')
   
   const megapixelOptions = [10, 20, 30, 40, 60, 100]
+  const sensorOptions = [
+    'medium-format',
+    'full-frame',
+    'aps-c',
+    'm43',
+    '1-inch',
+    '2-3-inch',
+    '1-1.7-inch',
+    '1-2.3-inch',
+    '1-3-inch'
+  ]
   
   const handleTogglePixel = (pixel: number) => {
     setSelectedPixels(prev => 
       prev.includes(pixel) 
         ? prev.filter(p => p !== pixel) 
         : [...prev, pixel].sort((a, b) => a - b)
+    )
+  }
+
+  const handleToggleSensor = (sensor: string) => {
+    setSelectedSensors(prev => 
+      prev.includes(sensor)
+        ? prev.filter(s => s !== sensor)
+        : [...prev, sensor]
     )
   }
 
@@ -31,6 +52,25 @@ const App = () => {
     } else {
       return `${pixel} ${t('controls.megapixels')}`;
     }
+  };
+
+  // Get sensor name for display
+  const getSensorName = (sensorKey: string) => {
+    if (language === 'zh') {
+      return t(`sensor.${sensorKey}`);
+    }
+    const names: Record<string, string> = {
+      'medium-format': 'Medium Format',
+      'full-frame': 'Full Frame (35mm)',
+      'aps-c': 'APS-C',
+      'm43': 'M43',
+      '1-inch': '1 inch',
+      '2-3-inch': '2/3 inch',
+      '1-1.7-inch': '1/1.7 inch',
+      '1-2.3-inch': '1/2.3 inch',
+      '1-3-inch': '1/3 inch'
+    };
+    return names[sensorKey];
   };
 
   return (
@@ -60,6 +100,16 @@ const App = () => {
             onClick={() => setActiveTab('size')}
           >
             {t('tabs.size')}
+          </button>
+                    <button
+            className={`px-6 py-3 text-md font-medium ${
+              activeTab === 'sensor' 
+                ? 'border-b-2 border-blue-500 text-blue-600' 
+                : 'text-gray-500 hover:text-gray-700'
+            }`}
+            onClick={() => setActiveTab('sensor')}
+          >
+            {t('tabs.sensor')}
           </button>
           <button
             className={`px-6 py-3 text-md font-medium ${
@@ -104,6 +154,27 @@ const App = () => {
           </div>
         )}
 
+        {/* Sensor Controls */}
+        {activeTab === 'sensor' && (
+          <div className="p-6 border-b border-gray-200">
+            <h2 className="text-xl font-semibold text-gray-800 mb-4">{t('controls.sensors')}</h2>
+            
+            <div className="flex flex-wrap gap-3">
+              {sensorOptions.map(sensor => (
+                <label key={sensor} className="inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    className="form-checkbox rounded text-blue-500 h-5 w-5"
+                    checked={selectedSensors.includes(sensor)}
+                    onChange={() => handleToggleSensor(sensor)}
+                  />
+                  <span className="ml-2 text-gray-700">{getSensorName(sensor)}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Tab Content */}
         {activeTab === 'size' && selectedPixels.length > 0 && (
           <PixelComparison selectedPixels={selectedPixels} />
@@ -116,10 +187,20 @@ const App = () => {
         {activeTab === 'focal' && (
           <FocalLength />
         )}
+
+        {activeTab === 'sensor' && selectedSensors.length > 0 && (
+          <SensorComparison selectedSensors={selectedSensors} />
+        )}
         
-        {(activeTab !== 'focal' && selectedPixels.length === 0) && (
+        {(activeTab !== 'focal' && activeTab === 'size' && selectedPixels.length === 0) && (
           <div className="p-6 text-center text-gray-500">
             {t('controls.empty')}
+          </div>
+        )}
+
+        {(activeTab === 'sensor' && selectedSensors.length === 0) && (
+          <div className="p-6 text-center text-gray-500">
+            {t('controls.empty.sensors')}
           </div>
         )}
       </div>
