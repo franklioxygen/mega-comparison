@@ -217,6 +217,17 @@ const FocalLength: React.FC<FocalLengthProps> = () => {
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+          <div className="flex flex-col justify-start items-center">
+          <div className="mb-2 text-sm font-medium text-gray-700">Selected Area ({focalLength}mm)</div>
+          <div
+            ref={cropViewRef}
+            className="bg-gray-100 rounded-lg overflow-hidden shadow-md"
+            style={getCropViewStyle()}
+          />
+          <div className="mt-2 text-xs text-gray-500 italic text-center">
+            This shows how the scene would appear at {focalLength}mm focal length
+          </div>
+        </div>
         <div className="md:col-span-2">
           <div 
             ref={containerRef}
@@ -251,18 +262,6 @@ const FocalLength: React.FC<FocalLengthProps> = () => {
           </div>
           <div className="text-xs text-gray-500 mt-2 italic">
             Drag the red rectangle to explore different compositions
-          </div>
-        </div>
-        
-        <div className="flex flex-col justify-start items-center">
-          <div className="mb-2 text-sm font-medium text-gray-700">Selected Area ({focalLength}mm)</div>
-          <div
-            ref={cropViewRef}
-            className="bg-gray-100 rounded-lg overflow-hidden shadow-md"
-            style={getCropViewStyle()}
-          />
-          <div className="mt-2 text-xs text-gray-500 italic text-center">
-            This shows how the scene would appear at {focalLength}mm focal length
           </div>
         </div>
       </div>
