@@ -14,41 +14,95 @@ function focalLengthToFOV(focalLength: number, sensorWidth = 36) {
 const FocalLength: React.FC<FocalLengthProps> = () => {
   const [focalLength, setFocalLength] = useState(50); // Default 50mm focal length
   const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  
   const imageRef = useRef<HTMLImageElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const viewRectRef = useRef<HTMLDivElement>(null);
+  const cropViewRef = useRef<HTMLDivElement>(null);
 
   // Calculate FOV
   const fov = focalLengthToFOV(focalLength);
   
   // Calculate view rectangle size based on FOV
   const calculateViewRect = () => {
-    if (!imageSize.width) return { width: 0, height: 0, left: 0, top: 0 };
+    if (!imageSize.width) return { width: 0, height: 0 };
     
     // Assume full image width represents a 10mm focal length view (widest view)
     const widestFocalLength = 10; // mm
     const widestFOV = focalLengthToFOV(widestFocalLength);
     
     // Calculate scale based on the ratio of current FOV to the widest FOV
-    // At 10mm, this will be 1.0 (full width)
-    // At larger focal lengths, this will be smaller (e.g., at 50mm, around 0.2)
     const scale = fov / widestFOV;
     
     // Maintain aspect ratio based on FOV calculation
-    // Standard 3:2 aspect ratio for most cameras
     const aspectRatio = 3/2;
     
     // Calculate width and height
     const width = imageSize.width * scale;
     const height = width / aspectRatio;
     
-    // Center the rectangle
-    const left = (imageSize.width - width) / 2;
-    const top = (imageSize.height - height) / 2;
-    
-    return { width, height, left, top };
+    return { width, height };
   };
   
   const viewRect = calculateViewRect();
+
+  // Handle mouse/touch events for dragging
+  const handleDragStart = (e: React.MouseEvent | React.TouchEvent) => {
+    setIsDragging(true);
+    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+    setDragStart({
+      x: clientX - position.x,
+      y: clientY - position.y
+    });
+  };
+
+  const handleDragMove = (e: MouseEvent | TouchEvent) => {
+    if (!isDragging || !containerRef.current || !viewRectRef.current) return;
+
+    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+    
+    const containerRect = containerRef.current.getBoundingClientRect();
+    const viewRectElement = viewRectRef.current;
+    
+    // Calculate new position
+    let newX = clientX - dragStart.x;
+    let newY = clientY - dragStart.y;
+    
+    // Add bounds checking
+    const maxX = containerRect.width - viewRect.width;
+    const maxY = containerRect.height - viewRect.height;
+    
+    newX = Math.max(0, Math.min(newX, maxX));
+    newY = Math.max(0, Math.min(newY, maxY));
+    
+    setPosition({ x: newX, y: newY });
+  };
+
+  const handleDragEnd = () => {
+    setIsDragging(false);
+  };
+
+  // Add and remove event listeners
+  useEffect(() => {
+    if (isDragging) {
+      window.addEventListener('mousemove', handleDragMove);
+      window.addEventListener('mouseup', handleDragEnd);
+      window.addEventListener('touchmove', handleDragMove);
+      window.addEventListener('touchend', handleDragEnd);
+    }
+    
+    return () => {
+      window.removeEventListener('mousemove', handleDragMove);
+      window.removeEventListener('mouseup', handleDragEnd);
+      window.removeEventListener('touchmove', handleDragMove);
+      window.removeEventListener('touchend', handleDragEnd);
+    };
+  }, [isDragging]);
   
   // Update image dimensions when it loads
   useEffect(() => {
@@ -56,6 +110,8 @@ const FocalLength: React.FC<FocalLengthProps> = () => {
       if (imageRef.current && containerRef.current) {
         const { width, height } = imageRef.current.getBoundingClientRect();
         setImageSize({ width, height });
+        // Reset position when image size changes
+        setPosition({ x: (width - viewRect.width) / 2, y: (height - viewRect.height) / 2 });
       }
     };
     
@@ -72,10 +128,54 @@ const FocalLength: React.FC<FocalLengthProps> = () => {
     // Update on window resize
     window.addEventListener('resize', updateImageSize);
     return () => window.removeEventListener('resize', updateImageSize);
-  }, []);
+  }, [viewRect.width, viewRect.height]);
+
+  // Reset position when focal length changes
+  useEffect(() => {
+    if (imageSize.width && imageSize.height) {
+      const rect = calculateViewRect();
+      setPosition({
+        x: (imageSize.width - rect.width) / 2,
+        y: (imageSize.height - rect.height) / 2
+      });
+    }
+  }, [focalLength]);
   
   // Focal length presets
   const focalPresets = [14, 24, 35, 50, 85, 135, 200];
+
+  // Calculate styles for the crop view (zoomed in area)
+  const getCropViewStyle = () => {
+    if (!imageRef.current) return {};
+    
+    const imgSrc = imageRef.current.src;
+    const imageWidth = imageSize.width;
+    const imageHeight = imageSize.height;
+    
+    // Calculate scale factors
+    const scaleFactorX = imageRef.current.naturalWidth / imageWidth;
+    const scaleFactorY = imageRef.current.naturalHeight / imageHeight;
+    
+    // Calculate crop position in terms of the original image
+    const cropX = position.x * scaleFactorX;
+    const cropY = position.y * scaleFactorY;
+    
+    // Calculate size of crop area in terms of the original image
+    const cropWidth = viewRect.width * scaleFactorX;
+    const cropHeight = viewRect.height * scaleFactorY;
+    
+    // Calculate the size of the crop view container
+    const containerWidth = 300; // fixed width for the crop view
+    const containerHeight = (containerWidth / viewRect.width) * viewRect.height;
+    
+    return {
+      backgroundImage: `url(${imgSrc})`,
+      backgroundSize: `${imageRef.current.naturalWidth * (containerWidth / cropWidth)}px ${imageRef.current.naturalHeight * (containerHeight / cropHeight)}px`,
+      backgroundPosition: `-${cropX * (containerWidth / cropWidth)}px -${cropY * (containerHeight / cropHeight)}px`,
+      width: `${containerWidth}px`,
+      height: `${containerHeight}px`,
+    };
+  };
 
   return (
     <div className="p-6">
@@ -116,32 +216,55 @@ const FocalLength: React.FC<FocalLengthProps> = () => {
         </div>
       </div>
       
-      <div 
-        ref={containerRef}
-        className="relative mb-6 bg-gray-100 rounded-lg overflow-hidden"
-      >
-        <img
-          ref={imageRef}
-          src={`${import.meta.env.BASE_URL}images/origin.png`}
-          alt="Original scene for focal length comparison"
-          className="w-full h-auto"
-          draggable="false"
-          onError={(e) => {
-            const target = e.target as HTMLImageElement;
-            target.src = `${import.meta.env.BASE_URL}images/placeholder.svg`;
-          }}
-        />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        <div className="md:col-span-2">
+          <div 
+            ref={containerRef}
+            className="relative bg-gray-100 rounded-lg overflow-hidden cursor-move"
+          >
+            <img
+              ref={imageRef}
+              src={`${import.meta.env.BASE_URL}images/origin.png`}
+              alt="Original scene for focal length comparison"
+              className="w-full h-auto select-none"
+              draggable="false"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.src = `${import.meta.env.BASE_URL}images/placeholder.svg`;
+              }}
+            />
+            
+            {/* View rectangle overlay */}
+            <div
+              ref={viewRectRef}
+              className="absolute border-4 border-red-500 pointer-events-auto transition-all duration-300 cursor-move"
+              style={{
+                width: `${viewRect.width}px`,
+                height: `${viewRect.height}px`,
+                left: `${position.x}px`,
+                top: `${position.y}px`,
+                transform: isDragging ? 'scale(1.02)' : 'scale(1)',
+              }}
+              onMouseDown={handleDragStart}
+              onTouchStart={handleDragStart}
+            />
+          </div>
+          <div className="text-xs text-gray-500 mt-2 italic">
+            Drag the red rectangle to explore different compositions
+          </div>
+        </div>
         
-        {/* View rectangle overlay */}
-        <div
-          className="absolute border-4 border-red-500 pointer-events-none transition-all duration-300"
-          style={{
-            width: `${viewRect.width}px`,
-            height: `${viewRect.height}px`,
-            left: `${viewRect.left}px`,
-            top: `${viewRect.top}px`,
-          }}
-        />
+        <div className="flex flex-col justify-start items-center">
+          <div className="mb-2 text-sm font-medium text-gray-700">Selected Area ({focalLength}mm)</div>
+          <div
+            ref={cropViewRef}
+            className="bg-gray-100 rounded-lg overflow-hidden shadow-md"
+            style={getCropViewStyle()}
+          />
+          <div className="mt-2 text-xs text-gray-500 italic text-center">
+            This shows how the scene would appear at {focalLength}mm focal length
+          </div>
+        </div>
       </div>
       
       <div className="mt-4 p-4 bg-gray-50 rounded-lg">
@@ -153,7 +276,7 @@ const FocalLength: React.FC<FocalLengthProps> = () => {
         </p>
         <p className="text-sm text-gray-600">
           The red rectangle represents what would be visible in the frame at the 
-          selected focal length, assuming the full image width is visible at 10mm.
+          selected focal length. You can drag it around to explore different compositions.
           This is a simplified visualization based on a full-frame (36mm) sensor.
         </p>
       </div>

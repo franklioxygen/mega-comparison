@@ -85,11 +85,6 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ selectedPixels }) => {
                   }}
                 />
               </div>
-              <div className="text-center">
-                <p className="text-xs text-gray-400">
-                  Total pixels: {(dimensions.width * dimensions.height).toLocaleString()}
-                </p>
-              </div>
             </div>
           );
         })}
