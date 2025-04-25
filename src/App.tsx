@@ -20,11 +20,14 @@ const App = () => {
   return (
     <div className="container mx-auto px-4 py-10 max-w-6xl">
       <header className="mb-8 text-center">
-        <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2">
+        <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
           MegaComparison
         </h1>
-        <p className="text-gray-600 max-w-2xl mx-auto">
-          A visual comparison tool for digital camera resolutions. Select different megapixel options to compare their relative sizes.
+        <p className="text-gray-600 max-w-2xl mx-auto mb-2">
+          Explore how camera sensor resolutions compare in real-world dimensions. From entry-level 10MP to professional 100MP sensors, visualize the actual size differences and understand what these numbers mean for your photography.
+        </p>
+        <p className="text-sm text-gray-500 max-w-2xl mx-auto">
+          Compare sensor resolutions side by side, view sample images, and explore how focal lengths affect your field of view.
         </p>
       </header>
 
