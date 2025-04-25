@@ -15,8 +15,6 @@ const FocalLength: React.FC<FocalLengthProps> = () => {
   const [focalLength, setFocalLength] = useState(50); // Default 50mm focal length
   const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
   const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   
   const imageRef = useRef<HTMLImageElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -49,28 +47,19 @@ const FocalLength: React.FC<FocalLengthProps> = () => {
   
   const viewRect = calculateViewRect();
 
-  // Handle mouse/touch events for dragging
-  const handleDragStart = (e: React.MouseEvent | React.TouchEvent) => {
-    setIsDragging(true);
-    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
-    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
-    setDragStart({
-      x: clientX - position.x,
-      y: clientY - position.y
-    });
-  };
+  // Handle click events for positioning
+  const handleContainerClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!containerRef.current || !viewRectRef.current) return;
 
-  const handleDragMove = (e: MouseEvent | TouchEvent) => {
-    if (!isDragging || !containerRef.current || !viewRectRef.current) return;
-
-    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
-    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
-    
     const containerRect = containerRef.current.getBoundingClientRect();
     
-    // Calculate new position
-    let newX = clientX - dragStart.x;
-    let newY = clientY - dragStart.y;
+    // Calculate click position relative to container
+    const clickX = e.clientX - containerRect.left;
+    const clickY = e.clientY - containerRect.top;
+    
+    // Calculate new position, centering the view rectangle on the click
+    let newX = clickX - (viewRect.width / 2);
+    let newY = clickY - (viewRect.height / 2);
     
     // Add bounds checking
     const maxX = containerRect.width - viewRect.width;
@@ -81,27 +70,6 @@ const FocalLength: React.FC<FocalLengthProps> = () => {
     
     setPosition({ x: newX, y: newY });
   };
-
-  const handleDragEnd = () => {
-    setIsDragging(false);
-  };
-
-  // Add and remove event listeners
-  useEffect(() => {
-    if (isDragging) {
-      window.addEventListener('mousemove', handleDragMove);
-      window.addEventListener('mouseup', handleDragEnd);
-      window.addEventListener('touchmove', handleDragMove);
-      window.addEventListener('touchend', handleDragEnd);
-    }
-    
-    return () => {
-      window.removeEventListener('mousemove', handleDragMove);
-      window.removeEventListener('mouseup', handleDragEnd);
-      window.removeEventListener('touchmove', handleDragMove);
-      window.removeEventListener('touchend', handleDragEnd);
-    };
-  }, [isDragging]);
   
   // Update image dimensions when it loads
   useEffect(() => {
@@ -216,7 +184,7 @@ const FocalLength: React.FC<FocalLengthProps> = () => {
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-          <div className="flex flex-col justify-start items-center">
+        <div className="flex flex-col justify-start items-center">
           <div className="mb-2 text-sm font-medium text-gray-700">Selected Area ({focalLength}mm)</div>
           <div
             ref={cropViewRef}
@@ -230,7 +198,8 @@ const FocalLength: React.FC<FocalLengthProps> = () => {
         <div className="md:col-span-2">
           <div 
             ref={containerRef}
-            className="relative bg-gray-100 rounded-lg overflow-hidden cursor-move"
+            className="relative bg-gray-100 rounded-lg overflow-hidden cursor-crosshair"
+            onClick={handleContainerClick}
           >
             <img
               ref={imageRef}
@@ -247,20 +216,17 @@ const FocalLength: React.FC<FocalLengthProps> = () => {
             {/* View rectangle overlay */}
             <div
               ref={viewRectRef}
-              className="absolute border-4 border-red-500 pointer-events-auto transition-all duration-300 cursor-move"
+              className="absolute border-4 border-red-500 pointer-events-none transition-all duration-300"
               style={{
                 width: `${viewRect.width}px`,
                 height: `${viewRect.height}px`,
                 left: `${position.x}px`,
                 top: `${position.y}px`,
-                transform: isDragging ? 'scale(1.02)' : 'scale(1)',
               }}
-              onMouseDown={handleDragStart}
-              onTouchStart={handleDragStart}
             />
           </div>
           <div className="text-xs text-gray-500 mt-2 italic">
-            Drag the red rectangle to explore different compositions
+            Click anywhere on the image to move the red rectangle
           </div>
         </div>
       </div>
@@ -274,8 +240,8 @@ const FocalLength: React.FC<FocalLengthProps> = () => {
         </p>
         <p className="text-sm text-gray-600">
           The red rectangle represents what would be visible in the frame at the 
-          selected focal length. You can drag it around to explore different compositions.
-          This is a simplified visualization based on a full-frame (36mm) sensor.
+          selected focal length. Click anywhere on the image to move the frame and explore 
+          different compositions. This is a simplified visualization based on a full-frame (36mm) sensor.
         </p>
       </div>
     </div>
