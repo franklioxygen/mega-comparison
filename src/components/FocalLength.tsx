@@ -122,13 +122,13 @@ const FocalLength: React.FC<FocalLengthProps> = () => {
       >
         <img
           ref={imageRef}
-          src="/images/origin.png"
+          src={`${import.meta.env.BASE_URL}images/origin.png`}
           alt="Original scene for focal length comparison"
           className="w-full h-auto"
           draggable="false"
           onError={(e) => {
             const target = e.target as HTMLImageElement;
-            target.src = '/images/placeholder.svg';
+            target.src = `${import.meta.env.BASE_URL}images/placeholder.svg`;
           }}
         />
         

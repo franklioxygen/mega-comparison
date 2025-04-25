@@ -7,7 +7,8 @@ interface ImageGalleryProps {
 const ImageGallery: React.FC<ImageGalleryProps> = ({ selectedPixels }) => {
   // Create sample image paths based on megapixel values
   const getImagePath = (megapixels: number) => {
-    return `/images/${megapixels}.jpg`;
+    // Using the full path from the public directory
+    return `${import.meta.env.BASE_URL}images/${megapixels}.jpg`;
   };
 
   // Real dimensions for each megapixel option
@@ -45,7 +46,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ selectedPixels }) => {
                   // Fallback if image doesn't exist
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
-                    target.src = '/images/placeholder.svg';
+                    target.src = `${import.meta.env.BASE_URL}images/placeholder.svg`;
                   }}
                 />
               </div>
