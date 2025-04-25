@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useLanguage } from '../i18n/languageContext';
 
 interface FocalLengthProps {
 }
@@ -12,6 +13,7 @@ function focalLengthToFOV(focalLength: number, sensorWidth = 36) {
 }
 
 const FocalLength: React.FC<FocalLengthProps> = () => {
+  const { t } = useLanguage();
   const [focalLength, setFocalLength] = useState(50); // Default 50mm focal length
   const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
   const [position, setPosition] = useState({ x: 0, y: 0 });
@@ -146,13 +148,13 @@ const FocalLength: React.FC<FocalLengthProps> = () => {
 
   return (
     <div className="p-6">
-      <h2 className="text-xl font-semibold text-gray-800 mb-6">Focal Length Visualizer</h2>
+      <h2 className="text-xl font-semibold text-gray-800 mb-6">{t('focal.title')}</h2>
       
       <div className="bg-white rounded-lg shadow-sm mb-6 p-4">
         <div className="mb-4">
           <div className="flex justify-between items-center mb-2">
-            <span className="font-medium text-gray-800">Focal Length: {focalLength}mm</span>
-            <span className="text-gray-600">Field of View: {fov.toFixed(1)}°</span>
+            <span className="font-medium text-gray-800">{t('focal.length')} {focalLength}{t('focal.mm')}</span>
+            <span className="text-gray-600">{t('focal.fov')} {fov.toFixed(1)}{t('focal.degrees')}</span>
           </div>
           
           <input
@@ -176,7 +178,7 @@ const FocalLength: React.FC<FocalLengthProps> = () => {
                     : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                 }`}
               >
-                {preset}mm
+                {preset}{t('focal.mm')}
               </button>
             ))}
           </div>
@@ -185,14 +187,14 @@ const FocalLength: React.FC<FocalLengthProps> = () => {
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
         <div className="flex flex-col justify-start items-center">
-          <div className="mb-2 text-sm font-medium text-gray-700">Selected Area ({focalLength}mm)</div>
+          <div className="mb-2 text-sm font-medium text-gray-700">{t('focal.selected')} ({focalLength}{t('focal.mm')})</div>
           <div
             ref={cropViewRef}
             className="bg-gray-100 rounded-lg overflow-hidden shadow-md"
             style={getCropViewStyle()}
           />
           <div className="mt-2 text-xs text-gray-500 italic text-center">
-            This shows how the scene would appear at {focalLength}mm focal length
+            {t('focal.appears')} {focalLength}{t('focal.mm')}
           </div>
         </div>
         <div className="md:col-span-2">
@@ -226,15 +228,15 @@ const FocalLength: React.FC<FocalLengthProps> = () => {
             />
           </div>
           <div className="text-xs text-gray-500 mt-2 italic">
-            Click anywhere on the image to move the red rectangle
+            {t('focal.click')}
           </div>
         </div>
       </div>
       
       <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-        <h3 className="text-md font-medium text-gray-700 mb-2">About Focal Length</h3>
+        <h3 className="text-md font-medium text-gray-700 mb-2">{t('focal.about.title')}</h3>
         <p className="text-sm text-gray-600">
-          Simulated view of how focal length affects field of view and apparent distance in photography.
+          {t('focal.about.description')}
         </p>
       </div>
     </div>

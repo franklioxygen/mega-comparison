@@ -14,7 +14,7 @@ const LanguageToggle: React.FC = () => {
       onClick={toggleLanguage}
       className="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md transition-colors"
     >
-      {t('language.switch')} {t(`language.${language === 'en' ? 'zh' : 'en'}`)}
+      {t(`language.${language === 'en' ? 'zh' : 'en'}`)}
     </button>
   );
 };

@@ -1,0 +1,85 @@
+{
+  "header": {
+    "title": "Mega Comparison",
+    "home": "Home",
+    "focal": "Focal Length",
+    "aperture": "Aperture",
+    "comparison": "Comparison Viewer",
+    "todo": "Todo List"
+  },
+  "home": {
+    "title": "Welcome to Mega Comparison",
+    "subtitle": "A visual tool to understand camera settings and photo comparisons",
+    "description": "This tool helps photographers and enthusiasts visualize fundamental camera concepts.",
+    "features": "Features",
+    "focal-feature": "Focal Length Visualization",
+    "focal-description": "See how different focal lengths affect field of view and perspective.",
+    "aperture-feature": "Aperture Simulator",
+    "aperture-description": "Understand how aperture affects depth of field and background blur.",
+    "comparison-feature": "Multi-Image Comparison",
+    "comparison-description": "Compare multiple images side by side with synchronized panning and zooming.",
+    "todo-feature": "Todo List Manager",
+    "todo-description": "Keep track of your photography tasks and ideas.",
+    "start": "Get Started"
+  },
+  "todo": {
+    "title": "Todo List",
+    "add": "Add Task",
+    "empty": "Your todo list is empty",
+    "type": "Type a new task",
+    "completed": "Completed",
+    "active": "Active",
+    "delete": "Delete",
+    "all": "All",
+    "filter": "Filter:",
+    "left": "items left",
+    "clear": "Clear Completed"
+  },
+  "aperture": {
+    "title": "Aperture Visualizer",
+    "aperture": "Aperture",
+    "distance": "Subject Distance",
+    "meters": "m",
+    "focal": "Focal Length",
+    "mm": "mm",
+    "sensor": "Sensor Format",
+    "dof": "Depth of Field",
+    "calculation": "DoF Calculation",
+    "near": "Near Limit",
+    "far": "Far Limit",
+    "total": "Total DoF",
+    "hyperfocal": "Hyperfocal Distance",
+    "infinity": "Infinity",
+    "about": {
+      "title": "About Aperture",
+      "description": "The aperture determines how much light enters your camera and affects the depth of field. A smaller f-number (larger aperture) creates a shallower depth of field with more background blur."
+    }
+  },
+  "focal": {
+    "title": "Focal Length Visualizer",
+    "length": "Focal Length:",
+    "mm": "mm",
+    "fov": "Field of View:",
+    "degrees": "°",
+    "selected": "Selected Area",
+    "appears": "This shows how the scene would appear at",
+    "click": "Click anywhere on the image to move the red rectangle",
+    "about": {
+      "title": "About Focal Length",
+      "description": "Simulated view of how focal length affects field of view and apparent distance in photography."
+    }
+  },
+  "comparison": {
+    "title": "Image Comparison Viewer",
+    "select": "Select Images",
+    "drag": "Drag and drop images here, or click to select",
+    "max": "Maximum 6 images",
+    "zoom": "Zoom",
+    "reset": "Reset View",
+    "sync": "Sync Views",
+    "remove": "Remove All",
+    "layout": "Layout",
+    "columns": "columns",
+    "size": "Thumbnail Size"
+  }
+}
