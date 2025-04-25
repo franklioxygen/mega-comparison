@@ -19,7 +19,7 @@ const sensorDimensions: Record<string, { width: number; height: number; name: st
 };
 
 const SensorComparison: React.FC<SensorComparisonProps> = ({ selectedSensors }) => {
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
   const [isStacked, setIsStacked] = useState(false);
   const [containerWidth, setContainerWidth] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
