@@ -1,10 +1,13 @@
 import { useState } from 'react'
 import FocalLength from './components/FocalLength'
 import ImageGallery from './components/ImageGallery'
+import LanguageToggle from './components/LanguageToggle'
 import PixelComparison from './components/PixelComparison'
+import { useLanguage } from './i18n/languageContext'
 
 const App = () => {
-  const [selectedPixels, setSelectedPixels] = useState<number[]>([10, 40])
+  const { t, language } = useLanguage();
+  const [selectedPixels, setSelectedPixels] = useState<number[]>([10, 40]) // Default to 10MP and 40MP
   const [activeTab, setActiveTab] = useState<'size' | 'gallery' | 'focal'>('size')
   
   const megapixelOptions = [10, 20, 30, 40, 60, 100]
@@ -17,14 +20,31 @@ const App = () => {
     )
   }
 
+  // Format megapixel display for Chinese language
+  const formatMegapixels = (pixel: number) => {
+    if (language === 'zh') {
+      if (pixel === 100) {
+        return '1亿像素';
+      } else {
+        return `${pixel / 10}千万像素`;
+      }
+    } else {
+      return `${pixel} ${t('controls.megapixels')}`;
+    }
+  };
+
   return (
     <div className="container mx-auto px-4 py-10 max-w-6xl">
+      <div className="flex justify-end mb-4">
+        <LanguageToggle />
+      </div>
+      
       <header className="mb-8 text-center">
         <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
-          MegaComparison
+          {t('app.title')}
         </h1>
         <p className="text-gray-600 max-w-2xl mx-auto">
-          Compare camera sensors from 10MP to 100MP, with visual examples of resolution differences.
+          {t('app.description')}
         </p>
       </header>
 
@@ -39,7 +59,7 @@ const App = () => {
             }`}
             onClick={() => setActiveTab('size')}
           >
-            Size Comparison
+            {t('tabs.size')}
           </button>
           <button
             className={`px-6 py-3 text-md font-medium ${
@@ -49,7 +69,7 @@ const App = () => {
             }`}
             onClick={() => setActiveTab('gallery')}
           >
-            Image Gallery
+            {t('tabs.gallery')}
           </button>
           <button
             className={`px-6 py-3 text-md font-medium ${
@@ -59,14 +79,14 @@ const App = () => {
             }`}
             onClick={() => setActiveTab('focal')}
           >
-            Focal Length
+            {t('tabs.focal')}
           </button>
         </div>
 
         {/* Controls - Only show for size and gallery tabs */}
         {(activeTab === 'size' || activeTab === 'gallery') && (
           <div className="p-6 border-b border-gray-200">
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">Select Resolutions to Compare</h2>
+            <h2 className="text-xl font-semibold text-gray-800 mb-4">{t('controls.title')}</h2>
             
             <div className="flex flex-wrap gap-3">
               {megapixelOptions.map(pixel => (
@@ -77,7 +97,7 @@ const App = () => {
                     checked={selectedPixels.includes(pixel)}
                     onChange={() => handleTogglePixel(pixel)}
                   />
-                  <span className="ml-2 text-gray-700">{pixel} Megapixels</span>
+                  <span className="ml-2 text-gray-700">{formatMegapixels(pixel)}</span>
                 </label>
               ))}
             </div>
@@ -99,13 +119,13 @@ const App = () => {
         
         {(activeTab !== 'focal' && selectedPixels.length === 0) && (
           <div className="p-6 text-center text-gray-500">
-            Please select at least one resolution option to compare
+            {t('controls.empty')}
           </div>
         )}
       </div>
 
       <footer className="mt-12 text-center text-gray-500 text-sm">
-        <p>© {new Date().getFullYear()} MegaComparison - A digital camera specs comparison tool</p>
+        <p>{t('footer.copyright')}</p>
         <a 
           href="https://github.com/franklioxygen/mega-comparison"
           target="_blank"
@@ -115,7 +135,7 @@ const App = () => {
           <svg height="20" width="20" viewBox="0 0 16 16" className="fill-current">
             <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
           </svg>
-          <span>View on GitHub</span>
+          <span>{t('footer.github')}</span>
         </a>
       </footer>
     </div>

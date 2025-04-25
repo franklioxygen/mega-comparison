@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useLanguage } from '../i18n/languageContext';
 
 interface PixelComparisonProps {
   selectedPixels: number[];
@@ -15,9 +16,23 @@ const pixelDimensions: Record<number, { width: number; height: number }> = {
 };
 
 const PixelComparison: React.FC<PixelComparisonProps> = ({ selectedPixels }) => {
+  const { t, language } = useLanguage();
   const [isStacked, setIsStacked] = useState(false);
   const [containerWidth, setContainerWidth] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Format megapixel display for Chinese language
+  const formatMegapixels = (pixel: number) => {
+    if (language === 'zh') {
+      if (pixel === 100) {
+        return '1亿像素';
+      } else {
+        return `${pixel / 10}千万像素`;
+      }
+    } else {
+      return `${pixel} MP`;
+    }
+  };
 
   // Update container width on mount and resize
   useEffect(() => {
@@ -65,9 +80,9 @@ const PixelComparison: React.FC<PixelComparisonProps> = ({ selectedPixels }) => 
   return (
     <div className="p-6" ref={containerRef}>
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-semibold text-gray-800">Size Comparison</h2>
+        <h2 className="text-xl font-semibold text-gray-800">{t('size.title')}</h2>
         <div className="flex items-center">
-          <span className="mr-2 text-sm text-gray-600">Stack Blocks</span>
+          <span className="mr-2 text-sm text-gray-600">{t('size.stack')}</span>
           <label className="inline-flex items-center cursor-pointer">
             <input 
               type="checkbox" 
@@ -122,7 +137,7 @@ const PixelComparison: React.FC<PixelComparisonProps> = ({ selectedPixels }) => 
                     }}
                   >
                     <div className="absolute bottom-0 left-0 right-0 bg-white bg-opacity-75 text-gray-700 text-xs py-1 px-2">
-                      {pixels} MP ({actualDimensions.width} × {actualDimensions.height})
+                      {formatMegapixels(pixels)} ({actualDimensions.width} × {actualDimensions.height})
                     </div>
                   </div>
                 </div>
@@ -150,14 +165,14 @@ const PixelComparison: React.FC<PixelComparisonProps> = ({ selectedPixels }) => 
                   }}
                 >
                   <div className="text-xs md:text-sm font-medium absolute top-2 left-2 bg-white bg-opacity-75 px-2 py-1 rounded">
-                    {pixels} MP
+                    {formatMegapixels(pixels)}
                   </div>
                 </div>
                 <div className="text-sm text-gray-500">
                   {actualDimensions.width} × {actualDimensions.height} pixels
                 </div>
                 <div className="text-xs text-gray-400 mt-1">
-                  ({(actualDimensions.width * actualDimensions.height).toLocaleString()} total pixels)
+                  ({(actualDimensions.width * actualDimensions.height).toLocaleString()})
                 </div>
               </div>
             );
@@ -166,9 +181,9 @@ const PixelComparison: React.FC<PixelComparisonProps> = ({ selectedPixels }) => 
       )}
       
       <div className="mt-8 p-4 bg-gray-50 rounded-lg">
-        <h3 className="text-md font-medium text-gray-700 mb-2">About This Comparison</h3>
+        <h3 className="text-md font-medium text-gray-700 mb-2">{t('size.about.title')}</h3>
         <p className="text-sm text-gray-600">
-          Visual comparison of relative sensor sizes at different megapixel resolutions.
+          {t('size.about.description')}
         </p>
       </div>
     </div>
