@@ -233,15 +233,8 @@ const FocalLength: React.FC<FocalLengthProps> = () => {
       
       <div className="mt-4 p-4 bg-gray-50 rounded-lg">
         <h3 className="text-md font-medium text-gray-700 mb-2">About Focal Length</h3>
-        <p className="text-sm text-gray-600 mb-2">
-          Focal length determines the field of view (FOV) of a camera. A shorter focal length 
-          (e.g., 14mm) gives a wider view, while a longer focal length (e.g., 200mm) produces a 
-          narrower, zoomed-in view.
-        </p>
         <p className="text-sm text-gray-600">
-          The red rectangle represents what would be visible in the frame at the 
-          selected focal length. Click anywhere on the image to move the frame and explore 
-          different compositions. This is a simplified visualization based on a full-frame (36mm) sensor.
+          Simulated view of how focal length affects field of view and apparent distance in photography.
         </p>
       </div>
     </div>

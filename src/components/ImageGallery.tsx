@@ -93,9 +93,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ selectedPixels }) => {
       <div className="mt-8 p-4 bg-gray-50 rounded-lg">
         <h3 className="text-md font-medium text-gray-700 mb-2">About This Gallery</h3>
         <p className="text-sm text-gray-600">
-          This gallery shows sample images for each megapixel resolution, maintaining their original aspect ratios.
-          Each image is displayed at a size that fits your screen while preserving the relative proportions of the original resolution.
-          The dimensions shown represent the actual pixel dimensions of the camera sensor at each megapixel setting.
+          Sample images showing simulated clarity differences between megapixel resolutions.
         </p>
       </div>
     </div>

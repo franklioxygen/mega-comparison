@@ -168,11 +168,7 @@ const PixelComparison: React.FC<PixelComparisonProps> = ({ selectedPixels }) => 
       <div className="mt-8 p-4 bg-gray-50 rounded-lg">
         <h3 className="text-md font-medium text-gray-700 mb-2">About This Comparison</h3>
         <p className="text-sm text-gray-600">
-          This visual representation shows the exact relative sizes of different camera resolutions. 
-          All blocks are scaled proportionally to maintain the exact size relationships between 
-          resolutions. {isStacked 
-            ? "In stack mode, all blocks are perfectly centered and layered with smaller resolutions on top of larger ones."
-            : "Toggle the stack option to view blocks stacked on top of each other with their centers aligned."}
+          Visual comparison of relative sensor sizes at different megapixel resolutions.
         </p>
       </div>
     </div>
