@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 interface PixelComparisonProps {
   selectedPixels: number[];
@@ -14,26 +14,42 @@ const pixelDimensions: Record<number, { width: number; height: number }> = {
   100: { width: 11648, height: 8736 }
 };
 
-// Function to calculate scaled dimensions for display
-const calculateDimensions = (megapixels: number): { width: number; height: number } => {
-  const dimensions = pixelDimensions[megapixels];
-  
-  // Use a fixed scale factor for all resolutions to maintain the exact relative sizes
-  const scaleFactor = 0.05; // Adjust this to make blocks fit on screen
-  
-  // Apply the same scale factor to all resolutions to maintain exact relative sizes
-  const width = dimensions.width * scaleFactor;
-  const height = dimensions.height * scaleFactor;
-  
-  return { width, height };
-};
-
 const PixelComparison: React.FC<PixelComparisonProps> = ({ selectedPixels }) => {
   const [isStacked, setIsStacked] = useState(false);
+  const [containerWidth, setContainerWidth] = useState(0);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Update container width on mount and resize
+  useEffect(() => {
+    const updateWidth = () => {
+      if (containerRef.current) {
+        setContainerWidth(containerRef.current.offsetWidth);
+      }
+    };
+
+    updateWidth();
+    window.addEventListener('resize', updateWidth);
+    return () => window.removeEventListener('resize', updateWidth);
+  }, []);
+
+  // Function to calculate scaled dimensions for display
+  const calculateDimensions = (megapixels: number): { width: number; height: number } => {
+    const dimensions = pixelDimensions[megapixels];
+    const maxImageWidth = pixelDimensions[100].width; // Width of 100MP image
+    
+    // Calculate scale factor based on container width
+    // If container is smaller than 100MP image, use container width as reference
+    const baseWidth = Math.min(containerWidth, maxImageWidth);
+    const scaleFactor = baseWidth / maxImageWidth;
+    
+    // Apply the scale factor to maintain relative sizes
+    const width = dimensions.width * scaleFactor;
+    const height = dimensions.height * scaleFactor;
+    
+    return { width, height };
+  };
   
   // Always sort pixels by size for consistent ordering
-  // In stacked view, we'll render them in this order (large to small)
-  // For non-stacked view, we'll reverse when displaying
   const sortedPixels = [...selectedPixels].sort((a, b) => b - a); // Largest to smallest
   
   // Find dimensions of largest selected resolution for container sizing
@@ -47,7 +63,7 @@ const PixelComparison: React.FC<PixelComparisonProps> = ({ selectedPixels }) => 
   });
 
   return (
-    <div className="p-6">
+    <div className="p-6" ref={containerRef}>
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-semibold text-gray-800">Size Comparison</h2>
         <div className="flex items-center">
@@ -71,10 +87,10 @@ const PixelComparison: React.FC<PixelComparisonProps> = ({ selectedPixels }) => 
           style={{
             width: `${maxWidth}px`,
             height: `${maxHeight}px`,
-            minHeight: '400px'
+            minHeight: '200px',
+            maxWidth: '100%'
           }}
         >
-          {/* Render largest to smallest so smaller ones are placed later in DOM (higher z-index) */}
           {sortedPixels.map((pixels, index) => {
             const { width, height } = calculateDimensions(pixels);
             const actualDimensions = pixelDimensions[pixels];
@@ -82,11 +98,7 @@ const PixelComparison: React.FC<PixelComparisonProps> = ({ selectedPixels }) => 
             // Calculate positioning to center this block relative to container
             const leftOffset = (maxWidth - width) / 2;
             const topOffset = (maxHeight - height) / 2;
-            
-            // Higher z-index for smaller resolutions to ensure they're on top
-            // First items in sortedPixels are largest (lowest z-index)
-            // Last items are smallest (highest z-index)
-            const zIndex = index + 1; // Smaller pixels (later items) get higher z-index
+            const zIndex = index + 1;
             
             return (
               <div 
@@ -107,7 +119,7 @@ const PixelComparison: React.FC<PixelComparisonProps> = ({ selectedPixels }) => 
                     minHeight: '30px',
                   }}
                 >
-                  <div className="absolute bottom-0 left-0 right-0 bg-opacity-60 text-grey text-xs py-1">
+                  <div className="absolute bottom-0 left-0 right-0 bg-white bg-opacity-75 text-gray-700 text-xs py-1 px-2">
                     {pixels} MP ({actualDimensions.width} × {actualDimensions.height})
                   </div>
                 </div>
@@ -118,13 +130,12 @@ const PixelComparison: React.FC<PixelComparisonProps> = ({ selectedPixels }) => 
       ) : (
         // Regular view - blocks are stacked vertically with smaller on top
         <div className="flex flex-col items-center justify-center space-y-8 py-4">
-          {/* For non-stacked view, we want smallest on top, so reverse the order */}
           {[...sortedPixels].reverse().map(pixels => {
             const { width, height } = calculateDimensions(pixels);
             const actualDimensions = pixelDimensions[pixels];
             
             return (
-              <div key={pixels} className="flex flex-col items-center mb-8">
+              <div key={pixels} className="flex flex-col items-center mb-8 w-full">
                 <div
                   className="pixel-block bg-blue-50 hover:bg-blue-100 mb-2 relative"
                   style={{
@@ -132,9 +143,10 @@ const PixelComparison: React.FC<PixelComparisonProps> = ({ selectedPixels }) => 
                     height: `${height}px`,
                     minWidth: '40px',
                     minHeight: '30px',
+                    maxWidth: '100%'
                   }}
                 >
-                  <div className="text-xs md:text-sm font-medium">
+                  <div className="text-xs md:text-sm font-medium absolute top-2 left-2 bg-white bg-opacity-75 px-2 py-1 rounded">
                     {pixels} MP
                   </div>
                 </div>
@@ -154,7 +166,7 @@ const PixelComparison: React.FC<PixelComparisonProps> = ({ selectedPixels }) => 
         <h3 className="text-md font-medium text-gray-700 mb-2">About This Comparison</h3>
         <p className="text-sm text-gray-600">
           This visual representation shows the exact relative sizes of different camera resolutions. 
-          All blocks are scaled by the same factor, maintaining the precise proportional differences between 
+          All blocks are scaled proportionally to maintain the exact size relationships between 
           resolutions. {isStacked 
             ? "In stack mode, all blocks are perfectly centered and layered with smaller resolutions on top of larger ones."
             : "Toggle the stack option to view blocks stacked on top of each other with their centers aligned."}
