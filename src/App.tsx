@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import PixelComparison from './components/PixelComparison'
-import ImageGallery from './components/ImageGallery'
 import FocalLength from './components/FocalLength'
+import ImageGallery from './components/ImageGallery'
+import PixelComparison from './components/PixelComparison'
 
 const App = () => {
   const [selectedPixels, setSelectedPixels] = useState<number[]>([])
@@ -94,7 +94,7 @@ const App = () => {
         )}
         
         {activeTab === 'focal' && (
-          <FocalLength selectedPixels={selectedPixels} />
+          <FocalLength />
         )}
         
         {(activeTab !== 'focal' && selectedPixels.length === 0) && (

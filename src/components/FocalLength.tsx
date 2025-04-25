@@ -1,7 +1,6 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 interface FocalLengthProps {
-  selectedPixels: number[];
 }
 
 // Function to calculate field of view based on focal length
@@ -12,7 +11,7 @@ function focalLengthToFOV(focalLength: number, sensorWidth = 36) {
   return degrees;
 }
 
-const FocalLength: React.FC<FocalLengthProps> = ({ selectedPixels }) => {
+const FocalLength: React.FC<FocalLengthProps> = () => {
   const [focalLength, setFocalLength] = useState(50); // Default 50mm focal length
   const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
   const imageRef = useRef<HTMLImageElement>(null);

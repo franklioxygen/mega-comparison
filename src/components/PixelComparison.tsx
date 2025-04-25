@@ -19,8 +19,6 @@ const calculateDimensions = (megapixels: number): { width: number; height: numbe
   const dimensions = pixelDimensions[megapixels];
   
   // Use a fixed scale factor for all resolutions to maintain the exact relative sizes
-  // We'll base it on the largest dimension to ensure everything fits on screen
-  const largestDimension = pixelDimensions[100].width; // 11648 is the largest width
   const scaleFactor = 0.05; // Adjust this to make blocks fit on screen
   
   // Apply the same scale factor to all resolutions to maintain exact relative sizes
