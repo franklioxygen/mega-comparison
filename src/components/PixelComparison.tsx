@@ -23,7 +23,7 @@ const PixelComparison: React.FC<PixelComparisonProps> = ({ selectedPixels }) => 
   useEffect(() => {
     const updateWidth = () => {
       if (containerRef.current) {
-        setContainerWidth(containerRef.current.offsetWidth);
+        setContainerWidth(containerRef.current.offsetWidth - 48); // Subtract padding
       }
     };
 
@@ -82,50 +82,53 @@ const PixelComparison: React.FC<PixelComparisonProps> = ({ selectedPixels }) => 
       
       {isStacked ? (
         // Stacked view - blocks overlay each other with centers aligned
-        <div 
-          className="relative mx-auto my-10" 
-          style={{
-            width: `${maxWidth}px`,
-            height: `${maxHeight}px`,
-            minHeight: '200px',
-            maxWidth: '100%'
-          }}
-        >
-          {sortedPixels.map((pixels, index) => {
-            const { width, height } = calculateDimensions(pixels);
-            const actualDimensions = pixelDimensions[pixels];
-            
-            // Calculate positioning to center this block relative to container
-            const leftOffset = (maxWidth - width) / 2;
-            const topOffset = (maxHeight - height) / 2;
-            const zIndex = index + 1;
-            
-            return (
-              <div 
-                key={pixels} 
-                className="absolute"
-                style={{
-                  left: `${leftOffset}px`,
-                  top: `${topOffset}px`,
-                  zIndex,
-                }}
-              >
-                <div
-                  className="pixel-block bg-blue-50 hover:bg-blue-100 relative border-2 border-gray-400"
+        <div className="relative mx-auto my-10 overflow-hidden">
+          <div 
+            className="relative"
+            style={{
+              width: `${maxWidth}px`,
+              height: `${maxHeight}px`,
+              minHeight: '200px',
+              maxWidth: '100%',
+              margin: '0 auto'
+            }}
+          >
+            {sortedPixels.map((pixels, index) => {
+              const { width, height } = calculateDimensions(pixels);
+              const actualDimensions = pixelDimensions[pixels];
+              
+              // Calculate positioning to center this block relative to container
+              const leftOffset = (maxWidth - width) / 2;
+              const topOffset = (maxHeight - height) / 2;
+              const zIndex = index + 1;
+              
+              return (
+                <div 
+                  key={pixels} 
+                  className="absolute transform-gpu"
                   style={{
-                    width: `${width}px`,
-                    height: `${height}px`,
-                    minWidth: '40px',
-                    minHeight: '30px',
+                    left: `${leftOffset}px`,
+                    top: `${topOffset}px`,
+                    zIndex,
                   }}
                 >
-                  <div className="absolute bottom-0 left-0 right-0 bg-white bg-opacity-75 text-gray-700 text-xs py-1 px-2">
-                    {pixels} MP ({actualDimensions.width} × {actualDimensions.height})
+                  <div
+                    className="pixel-block bg-blue-50 hover:bg-blue-100 relative border-2 border-gray-400"
+                    style={{
+                      width: `${width}px`,
+                      height: `${height}px`,
+                      minWidth: '40px',
+                      minHeight: '30px',
+                    }}
+                  >
+                    <div className="absolute bottom-0 left-0 right-0 bg-white bg-opacity-75 text-gray-700 text-xs py-1 px-2">
+                      {pixels} MP ({actualDimensions.width} × {actualDimensions.height})
+                    </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
       ) : (
         // Regular view - blocks are stacked vertically with smaller on top
